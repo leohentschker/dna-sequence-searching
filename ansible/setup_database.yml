@@ -1,0 +1,29 @@
+- hosts: servers
+  become: yes
+
+  tasks:
+    - name: Makes sure that python-apt is installed
+      apt:
+        name: python-apt
+        state: latest
+
+    - name: Install postgres dependencies
+      apt:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - postgresql
+        - postgresql-contrib
+        - python-psycopg2
+
+    - name: Creates the bio database
+      become_user: postgres
+      postgresql_db:
+        name: bio
+
+    - name: Creates the bio user on the postgresql database
+      become_user: postgres
+      postgresql_user:
+        name: bio
+        db: bio
+        password: bio
